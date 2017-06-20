@@ -25,6 +25,7 @@ import plotly.graph_objs as go
 # API access to plotting tools
 # Will need access to perform plotting
 #plotly.tools.set_credentials_file(username=, api_key =)
+plotly.tools.set_credentials_file(username='frksteenhoff2', api_key ='duu8hsfRmuI5rF2EU8o5')
 
 basePath    = "C:/Users/frksteenhoff/Documents/GitHub/MSc-Sembach-Beuschau_Jun2017/"
 pathToPlots = basePath + "Visualization"
@@ -232,17 +233,15 @@ def saveSetOfFileExtensions(data, filename):
 # -------------------------------------------------------------------------------- #
 # The actual visualization script
 # -------------------------------------------------------------------------------- #
-
 # Basic inits
 # Note! When creating boxlpots using line 3 and 20-22, the following slice is used: folders[1:]
 # The code can be run in modules by adding the "and False" statement to the if-statements 
-# the user wish to exclude. Below only the last if is run.
-
-# Some code is commented out as it is not plausible to run it all at once!
+# the user wish to exclude. Below only the last if is run
 
 folders = ['baseline', 'hp1', 'hp2','hp5', 'hp10', 'sh3', 'sh5', 'sh10', 'sh15']
 successShutdown     = 0
 lineNumber          = 0
+first = True
 
 boxplotDel         = [] # 2-d list for boxplot of deleted files
 boxplotNew         = [] # 2-d list for boxplot of new files
@@ -256,6 +255,7 @@ startDetLst        = [] # timedeltas from start to detection
 detShutLst         = [] # timedeltas from detection to shutdown
 boxStartDet        = [] # values for boxplot time from start to detection
 boxDetShut         = [] # values for boxplot time from detection to shutdown
+shutdownLst        = [] 
 fullListOfExtensions = [] # list of ransomwares and related extensions
 
 # Clear file extension list
@@ -299,7 +299,7 @@ for folder in folders[:1]:
                
             # fileMonObservations - the different files for analysis of order and file extensions
             # only for baseline, use slice folders[:1] when running, otherwise comment out!
-            elif (lineNumber == 19):
+            elif (lineNumber == 19 and lineNumber == -1):
                 # Get attribute and list of values
                 title, listValues = splitTitleAndFiles(lines, lineNumber)
                     
@@ -315,6 +315,15 @@ for folder in folders[:1]:
                 
             # Creating datastructures for boxplots of performance on shut-down
             elif (lineNumber == 3 or lineNumber ==  20 or lineNumber ==  21 or lineNumber ==  22) and lineNumber == -1:
+                # Create list of ransomwares in each test 
+                # 1   detected, 
+                # 0   not detected, 
+                # '-' not included
+                if folder == 'baseline' and first == True:
+                    df = pd.DataFrame('-',index=selectedFiles, columns=folders)
+                    del df['baseline'] # not needed, already on index
+                    first = False
+        
                 # Start time
                 if lineNumber == 3:
                     lineName, startTime = splitTitleAndFiles(lines, lineNumber)
@@ -338,8 +347,12 @@ for folder in folders[:1]:
         
         # Find number of ransomwares that do shut processes down.
         # '' indicates empty list
-        #if len(shutdownLst) >= 1 and shutdownLst[0] != '':
-        #    successShutdown += 1
+        print shutdownLst
+        if len(shutdownLst) >= 1 and shutdownLst[0] != '':
+            successShutdown += 1
+            df.loc[files][folder] = 1
+        else:
+            df.loc[files][folder] = 0
             
             # Only calculate time if shutdown has occured
             #if startTime[0] != '""' and detectionTime[0] != '""' and shutdownTime[0] != '""':
@@ -372,10 +385,16 @@ for folder in folders[:1]:
     #boxplotNew.append(newLst)
     #delLst = []
     #newLst = []
-    
-saveDataToFile(fullListOfExtensions, 'allExtensionOnBaseline', basePath, "\n")
 
 print "\nAll files read"
+
+# Save set of extensions to file
+saveDataToFile(fullListOfExtensions, 'allExtensionOnBaseline', basePath, "\n")
+
+# Save dataframe to excel file of ransomware included/detection status
+#writer = pd.ExcelWriter('ransomware_status.xlsx', engine='xlsxwriter')
+#df.to_excel(writer, sheet_name='Ransomware_status')
+#writer.save()
 
 # Creating and saving boxplots for deleted and new files
 #chdir(pathToPlots)
