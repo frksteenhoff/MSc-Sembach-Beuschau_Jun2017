@@ -9,5 +9,5 @@ All content in this repository is made for the Master Thesis of Jesper Bo Sembac
   * ``ExtractNManipulation.py`` - the .py-version of the exact same code found in the iPython Notebook.
 * ``ProofOfConcept.ipynb`` - some code snippets testing different pythonic methods.
 * ``allExtensionsOnBaseline.txt`` - the set of the file extensions encrypted by each ransomware
-* ``allExtensionsOnBaseline.xlsx`` - the .xslx-version of the .txt file of extensions (more ledgible)
+  * ``allExtensionsOnBaseline.xlsx`` - the .xslx-version of the .txt file of extensions (more ledgible)
 * ``BaselineFileData.txt`` - A list of all folders and files found and worked upon by each of the testing methods.  
