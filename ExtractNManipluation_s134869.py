@@ -265,7 +265,7 @@ chdir(basePath)
 #baselineData = getFileSizes('BaselineFileData.txt') not needed
 
 # For all folders in Speciale, access each folder and  'do something'
-for folder in folders[:1]:
+for folder in folders[1:]:
     pathToFiles   = basePath + "Speciale/" + folder 
     chdir(pathToFiles)
     selectedFiles = [file for file in listdir('.') if file.endswith('.txt')]
@@ -314,7 +314,7 @@ for folder in folders[:1]:
                 fullListOfExtensions.append(listToSave)
                 
             # Creating datastructures for boxplots of performance on shut-down
-            elif (lineNumber == 3 or lineNumber ==  20 or lineNumber ==  21 or lineNumber ==  22) and lineNumber == -1:
+            elif (lineNumber == 3 or lineNumber ==  20 or lineNumber ==  21 or lineNumber ==  22):# and lineNumber == -1:
                 # Create list of ransomwares in each test 
                 # 1   detected, 
                 # 0   not detected, 
@@ -347,22 +347,24 @@ for folder in folders[:1]:
         
         # Find number of ransomwares that do shut processes down.
         # '' indicates empty list
-        print shutdownLst
         if len(shutdownLst) >= 1 and shutdownLst[0] != '':
             successShutdown += 1
-            df.loc[files][folder] = 1
-        else:
-            df.loc[files][folder] = 0
+        #    df.loc[files][folder] = 1
+        #else:
+        #    df.loc[files][folder] = 0
             
             # Only calculate time if shutdown has occured
-            #if startTime[0] != '""' and detectionTime[0] != '""' and shutdownTime[0] != '""':
-            #    # Only if startime is properly formatted
-            #    # Calculate time from start -> detection and detection -> shutdown
-            #    startDetTime, detShutTime = getTimeDeltas(startTime, detectionTime, shutdownTime)
+            if startTime[0] != '""' and detectionTime[0] != '""' and shutdownTime[0] != '""':
+                # Only if startime is properly formatted
+                # Calculate time from start -> detection and detection -> shutdown
+                startDetTime, detShutTime = getTimeDeltas(startTime, detectionTime, shutdownTime)
 
                 # Adding time differences to lists
             #    startDetLst.append(startDetTime.total_seconds())
-            #    detShutLst.append(detShutTime.total_seconds())    
+                # If-statement for making the version taking hardware differences into account
+                #if folder == 'hp5' or folder == 'hp10' or folder == 'sh15':
+                #    detShutLst.append(detShutTime.total_seconds()*0.67)                    
+                detShutLst.append(detShutTime.total_seconds())    
     
     
         # Reset variables
@@ -371,14 +373,14 @@ for folder in folders[:1]:
         
     # Creating 2-d list for boxplots time
     #boxStartDet.append(startDetLst)
-    #boxDetShut.append(detShutLst)
+    boxDetShut.append(detShutLst)
     #startDetLst = []
-    #detShutLst  = []
+    detShutLst  = []
         
     # Append to lists of fail/success for boxplot
-    #failedShutdownCnt.append(len(selectedFiles) - successShutdown)
+    failedShutdownCnt.append(len(selectedFiles) - successShutdown)
     #successShutdownCnt.append(successShutdown)
-    #successShutdown = 0
+    successShutdown = 0
     
     # Create 2-d list for boxplots - new and deleted files
     #boxplotDel.append(delLst)    
@@ -409,4 +411,4 @@ saveDataToFile(fullListOfExtensions, 'allExtensionOnBaseline', basePath, "\n")
 # Start     -> detection
 # Detection -> shutdown
 #createBoxplot(boxStartDet, folders[1:], 'time_start-detection', 'Time from start to detection', 'Detection method', 'Seconds', 1000, True)
-#createBoxplot(boxDetShut, folders[1:], 'time_detection-shutdown', 'Time from detection to shutdown', 'Detection method', 'Seconds', 210, True)
+createBoxplot(boxDetShut, folders[1:], 'time_detection-shutdown_new', 'Time from detection to shutdown', 'Detection method', 'Seconds', 210, True)
